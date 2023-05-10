@@ -1,5 +1,10 @@
 .svg_display {
-    display: inline-block;
-    background-color: antiquewhite;
+    // background-color: lightgreen;
     border-radius: 10px;
+    height: 500px;
+    float: left;
+    background-color: lightgreen;
+    @media screen and (max-width: 840px) {
+      
+    }
 }

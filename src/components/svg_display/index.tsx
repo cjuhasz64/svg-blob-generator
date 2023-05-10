@@ -26,6 +26,7 @@ export default class SVGDisplay extends Component<Props, State> {
             stroke-width="0"
           >
           </path>
+   
         </svg>
       </div>
     )

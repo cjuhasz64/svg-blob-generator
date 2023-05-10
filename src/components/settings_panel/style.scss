@@ -1,6 +1,33 @@
 .settings_panel {
-    background-color: lightblue;
-    display: inline-block;
+    width: 300px;
+    float: right;
+    right: 0;
+    top: 0;
+    height: 100%;
+    position: relative;
+
     
-    width: 400px;
+
+    @media screen and (max-width: 840px) {
+       width: 100%;
+       height: auto;
+    }
+
+    > div {
+        height: 200px;
+        width: 192px;
+        padding: 10px;
+        position: absolute;
+        margin: auto;
+        top: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        left: 0;
+        right: 0;
+
+        @media screen and (max-width: 840px) {
+            -ms-transform: none;
+            transform: none;
+         }
+    }
 }
