@@ -10,144 +10,128 @@ interface Props {
 }
 
 interface State {
-  bloomFactor: number
+  bloomFactor: number,
+  vertexCount: number
 }
-
 
 export default class App extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      bloomFactor: 3
+      bloomFactor: 0.1,
+      vertexCount: 3
     };
     this.setBloomFactor = this.setBloomFactor.bind(this)
+    this.setVertexCount = this.setVertexCount.bind(this)
+  }
+  
+  bloom (coord: string, maxBloom: number): string {
+    // get a randow point betwenn the coord and the middle
+    // max bloom is a percentage, meaning the maximum from the 
+    // coord. i.e, 0.1 would be within 10% of distance between
+    // coord and center
+    const centerX = 50;
+    const centerY = 50;
+    const x = parseInt(coord.split(',')[0]);
+    const y = parseInt(coord.split(',')[1]);
+
+    const xDiff = centerX - x;
+    const yDiff = centerY - y;
+
+    const randomBloomPercetage = Math.round(Math.random() * (maxBloom) * 100) / 100
+
+    return `${x + (randomBloomPercetage * xDiff)},${y + (randomBloomPercetage * yDiff)}`
   }
 
-  bloom (coord: string, radius: number): string {
-    let x = parseInt(coord.split(',')[0])
-    let y = parseInt(coord.split(',')[1])
-
-    let bloomAmount = Math.round(( Math.random() * radius ) * 100) / 100
-
-    if (Math.round(Math.random()) === 1) {
-      x += bloomAmount
-    } else {
-      x -= bloomAmount
-    }
-
-    bloomAmount = Math.round(( Math.random() * radius ) * 100) / 100
-    if (Math.round(Math.random()) === 0) {
-      y += bloomAmount
-    } else {
-      y -= bloomAmount
-    }
-    return `${x},${y}`
-  }
-
-  // getBezierString (prevCoord: string, currentCoord: string) {
-  //   const prevCoordX = parseInt(prevCoord.split(',')[0]);
-  //   const prevCoordY = parseInt(prevCoord.split(',')[1]);
-  //   const currentCoordX = parseInt(currentCoord.split(',')[0]);
-  //   const currentCoordY = parseInt(currentCoord.split(',')[1]);
-
-  //   let prevBezier: string = '';
-  //   let currentBezier: string = '';
-
-  //   let bezierFactor: number = 10
-
-  //   // prev bezier, current bezier, current coord
-
-  //   // get prev bezier
-  //   if (prevCoordX < 50 && prevCoordY < 50) {
-  //     // top left
-  //     prevBezier = `${prevCoordX + bezierFactor},${prevCoordY - bezierFactor}`
-  //   } else if (prevCoordX >= 50 && prevCoordY < 50) {
-  //     // top right
-  //     prevBezier = `${prevCoordX + bezierFactor},${prevCoordY + bezierFactor}`
-  //   } else if (prevCoordX >= 50 && prevCoordY >= 50) {
-  //     // bottom right
-  //     prevBezier = `${prevCoordX - bezierFactor},${prevCoordY + bezierFactor}`
-  //   } else if (prevCoordX < 50 && prevCoordY >= 50) {
-  //     // bottom left   
-  //     prevBezier = `${prevCoordX - bezierFactor},${prevCoordY - bezierFactor}`
-  //   }
-
-  //   if (currentCoordX < 50 && currentCoordY < 50) {
-  //     // top left
-  //     currentBezier = `${currentCoordX - bezierFactor},${currentCoordY + bezierFactor}`
-  //   } else if (currentCoordX >= 50 && currentCoordY < 50) {
-  //     // top right
-  //     currentBezier = `${currentCoordX - bezierFactor},${currentCoordY - bezierFactor}`
-  //   } else if (currentCoordX >= 50 && currentCoordY >= 50) {
-  //     // bottom right
-  //     currentBezier = `${currentCoordX + bezierFactor},${currentCoordY - bezierFactor}`
-  //   } else if (currentCoordX < 50 && currentCoordY >= 50) {
-  //     // bottom left   
-  //     currentBezier = `${currentCoordX + bezierFactor},${currentCoordY + bezierFactor}`
-  //   }
-    
-  //   return `C${prevBezier},${currentBezier},${currentCoord}`
-
-  // }
-
-  getBezierString (prevCoord: string, currentCoord: string) {
-    const prevCoordX = parseInt(prevCoord.split(',')[0]);
-    const prevCoordY = parseInt(prevCoord.split(',')[1]);
+  getBezierPoint(currentCoord: string, clockwise: boolean, vertexCount: number): string {
+    const centerX: number = 50;
+    const centerY: number = 50;
     const currentCoordX = parseInt(currentCoord.split(',')[0]);
     const currentCoordY = parseInt(currentCoord.split(',')[1]);
 
-    let prevBezier: string = '';
-    let currentBezier: string = '';
+    const slop: number = (centerY-currentCoordY)/(centerX-currentCoordX);
 
-    let majorFactor: number = 10
-    let minorFactor: number = 5
+    const perpendicularSlop: number = Math.round(-(1/slop) * 100) / 100;
+    const c = 20 - vertexCount;   // length of bezier line (half) // segements increase, this number should reduce
+    const a = c/Math.sqrt(1+Math.pow(perpendicularSlop,2));
 
-    // prev bezier, current bezier, current coord
-
-    // get prev bezier
-    if (prevCoordX < 50 && prevCoordY < 50) {
-      // top left
-      prevBezier = `${prevCoordX + majorFactor},${prevCoordY - majorFactor}`
-    } else if (prevCoordX >= 50 && prevCoordY < 50) {
-      // top right
-      prevBezier = `${prevCoordX + majorFactor},${prevCoordY + majorFactor}`
-    } else if (prevCoordX >= 50 && prevCoordY >= 50) {
-      // bottom right
-      prevBezier = `${prevCoordX - majorFactor},${prevCoordY + majorFactor}`
-    } else if (prevCoordX < 50 && prevCoordY >= 50) {
-      // bottom left   
-      prevBezier = `${prevCoordX - majorFactor},${prevCoordY - majorFactor}`
-    }
-
-    if (currentCoordX < 50 && currentCoordY < 50) {
-      // top left
-      currentBezier = `${currentCoordX - majorFactor},${currentCoordY + majorFactor}`
-    } else if (currentCoordX >= 50 && currentCoordY < 50) {
-      // top right
-      currentBezier = `${currentCoordX - majorFactor},${currentCoordY - majorFactor}`
-    } else if (currentCoordX >= 50 && currentCoordY >= 50) {
-      // bottom right
-      currentBezier = `${currentCoordX + majorFactor},${currentCoordY - majorFactor}`
-    } else if (currentCoordX < 50 && currentCoordY >= 50) {
-      // bottom left   
-      currentBezier = `${currentCoordX + majorFactor},${currentCoordY + majorFactor}`
-    }
-    
-    return `C${prevBezier},${currentBezier},${currentCoord}`
-
+    if (currentCoordY < 50 && clockwise || currentCoordY >= 50 && !clockwise) {
+      return `${currentCoordX + a},${currentCoordY + (a*perpendicularSlop)}` 
+    } 
+    return `${currentCoordX - a},${currentCoordY - (a*perpendicularSlop)}` 
   }
 
-  generatePath (vertices: string []) {
-    let output = `M${vertices[0]} `
- 
-    for (let i = 1; i < vertices.length; i++) {
-      output += this.getBezierString(vertices[i-1], vertices[i]) + ' '
-    }
-    
-    // last curve
-    output += this.getBezierString(vertices[vertices.length - 1], vertices[0])
+  getBezierString (prevCoord: string, currentCoord: string, vertexCount: number) {
+    return `C${this.getBezierPoint(prevCoord,true,vertexCount)},${this.getBezierPoint(currentCoord,false,vertexCount)},${currentCoord}`
 
+    // prevBezier = `${prevCoordX + (0.3 * (currentCoordX - prevCoordX))},${prevCoordY + (0.3 * (currentCoordY - prevCoordY))}`
+    // currentBezier = `${prevCoordX + (0.7 * (currentCoordX - prevCoordX))},${prevCoordY + (0.7 * (currentCoordY - prevCoordY))}`
+
+    // const majorFactor = 20 - (vertexCount)
+    // const majorFactor = (4/3)*Math.tan(3.14/(2 * vertexCount))
+
+    // const majorFactor = 15
+
+    // // get prev bezier
+    // if (prevCoordX < 50 && prevCoordY < 50) {
+    //   // top left
+    //   prevBezier = `${prevCoordX + majorFactor},${prevCoordY - majorFactor}`
+    // } else if (prevCoordX > 50 && prevCoordY < 50) {
+    //   // top right
+    //   prevBezier = `${prevCoordX + majorFactor},${prevCoordY + majorFactor}`
+    // } else if (prevCoordX > 50 && prevCoordY > 50) {
+    //   // bottom right
+    //   prevBezier = `${prevCoordX - majorFactor},${prevCoordY + majorFactor}`
+    // } else if (prevCoordX < 50 && prevCoordY > 50) {
+    //   // bottom left   
+    //   prevBezier = `${prevCoordX - majorFactor},${prevCoordY - majorFactor}`
+    // } else if (prevCoordX === 50) {
+    //   if (prevCoordY > 50) {
+    //     // bottom to left
+    //     prevBezier = `${prevCoordX - majorFactor},${prevCoordY}`
+    //   } else {
+    //     // top to right
+    //     prevBezier = `${prevCoordX + majorFactor},${prevCoordY}`
+    //   }
+    // } else if (prevCoordY === 50) {
+
+    // }
+  
+    // if (currentCoordX < 50 && currentCoordY < 50) {
+    //   // top left
+    //   currentBezier = `${currentCoordX - majorFactor},${currentCoordY + majorFactor}`
+    // } else if (currentCoordX > 50 && currentCoordY < 50) {
+    //   // top right
+    //   currentBezier = `${currentCoordX - majorFactor},${currentCoordY - majorFactor}`
+    // } else if (currentCoordX > 50 && currentCoordY > 50) {
+    //   // bottom right
+    //   currentBezier = `${currentCoordX + majorFactor},${currentCoordY - majorFactor}`
+    // } else if (currentCoordX < 50 && currentCoordY > 50) {
+    //   // bottom left   
+    //   currentBezier = `${currentCoordX + majorFactor},${currentCoordY + majorFactor}`
+    // } else if (currentCoordX === 50) {
+    //   if (currentCoordY > 50) {
+    //     // bottom to right
+    //     currentBezier = `${currentCoordX + majorFactor},${currentCoordY}`
+    //   } else {
+    //     // bottom to left
+    //     currentBezier = `${currentCoordX - majorFactor},${currentCoordY}`
+    //   }
+    // } else if (currentCoordY === 50) {
+
+    // }
+  }
+
+  generatePath (bloomedVertices: string []) {
+    let output = `M${bloomedVertices[0]} `
+    const vertexCount = bloomedVertices.length;
+ 
+    for (let i = 1; i < bloomedVertices.length; i++) {
+      output += this.getBezierString(bloomedVertices[i-1], bloomedVertices[i], vertexCount) + ' '
+    }
+
+    output += this.getBezierString(bloomedVertices[bloomedVertices.length - 1], bloomedVertices[0], vertexCount)
     return output
   }
 
@@ -156,13 +140,10 @@ export default class App extends Component<Props, State> {
     let output = `M${vertices[0]} `
  
     for (let i = 1; i < vertices.length; i++) {
-      console.log(vertices[i])
       output += 'L' + vertices[i] + ' '
     }
     
-    // last curve
     output += 'Z'
-    console.log(output)
     return output
   }
 
@@ -172,36 +153,45 @@ export default class App extends Component<Props, State> {
     })
   }
 
+  setVertexCount (vertexCount: number) {
+    this.setState({
+      vertexCount: vertexCount
+    })
+  }
+
   getVertexCoords (vertexCount: number): string [] {
     let output: string [] = [];
     if (vertexCount === 3) {
-      return ['30,30','70,30','50,70']
+      return ['20,20','85,20','50,85']
     } else if (vertexCount === 4) {
-      return ['30,30','70,30','70,70','30,70']
+      return ['15,15','85,15','85,85','15,85']
     } else if (vertexCount === 5) {
-      return ['30,47','50,30','70,47','63,70', '37,70']
+      return ['15,47','50,15','85,47','70,85', '30,85']
+    } else if (vertexCount === 6) {
+      return ['15,30','50,10','85,30','85,70', '50,90', '15,70']
+    } else if (vertexCount === 7) {
+      return ['17,30','50,10','83,30','90,62', '70,90', '30,90', '10,62']
+    } else if (vertexCount === 8) {
+      return ['10,30','32,10','68,10','90,30', '90,65', '68,90', '32,90', '10,65']
     }
     return output;
   }
 
   render () {
-    const { bloomFactor } = this.state;
+    const { bloomFactor, vertexCount } = this.state;
 
-    const bloomedVertices = this.getVertexCoords(3).map(vertex => {
+    const bloomedVertices = this.getVertexCoords(vertexCount).map(vertex => {
       return this.bloom(vertex, bloomFactor)
     })
 
     return (
       <div className="App">
         <div className='main'>
+          {/* <SVGDisplay dPath={this.generatePathStraight(bloomedVertices)} point={this.getCircle(bloomedVertices[0],bloomedVertices[1])}/> */}
           <SVGDisplay dPath={this.generatePath(bloomedVertices)}/>
-          <SettingsPanel setBloomFactor={this.setBloomFactor}/>
+          <SettingsPanel setBloomFactor={this.setBloomFactor} setVertexCount={this.setVertexCount}/>
         </div>
-        
-      </div>
-      
+      </div> 
     )
-
-  }
-   
+  } 
 }

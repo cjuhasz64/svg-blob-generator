@@ -23,11 +23,25 @@ export default class SVGDisplay extends Component<Props, State> {
             d={dPath}
             width="100%"
             height="100%"
-            stroke-width="0"
+            strokeWidth="0"
           >
+         
           </path>
-   
+          
+          {/* <circle cx={'15'} cy={'78.65'} r="0.5" />
+          <circle cx={'55'} cy={'10'} r="0.5" />
+          <circle cx={'92.07'} cy={'77.92'} r="0.5" />
+       */}
+
+          <circle cx={'58.88'} cy={'94.10'} r="0.5" />
+      
+     
+    
         </svg>
+
+     
+
+        
       </div>
     )
   }
