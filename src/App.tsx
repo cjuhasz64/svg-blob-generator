@@ -25,7 +25,7 @@ export default class App extends Component<Props, State> {
     this.setBloomFactor = this.setBloomFactor.bind(this)
     this.setVertexCount = this.setVertexCount.bind(this)
   }
-  
+
   bloom (coord: string, maxBloom: number): string {
     // get a randow point betwenn the coord and the middle
     // max bloom is a percentage, meaning the maximum from the 
@@ -57,12 +57,14 @@ export default class App extends Component<Props, State> {
     const a = c/Math.sqrt(1+Math.pow(perpendicularSlop,2));
 
     if (currentCoordY < 50 && clockwise || currentCoordY >= 50 && !clockwise) {
-      return `${currentCoordX + a},${currentCoordY + (a*perpendicularSlop)}` 
+      return `${Math.round((currentCoordX + a) * 100) / 100},${Math.round((currentCoordY + (a*perpendicularSlop)) * 100) / 100}` 
     } 
-    return `${currentCoordX - a},${currentCoordY - (a*perpendicularSlop)}` 
+    return `${Math.round((currentCoordX - a) * 100) / 100},${Math.round((currentCoordY - (a*perpendicularSlop)) * 100) / 100}` 
   }
 
   getBezierString (prevCoord: string, currentCoord: string, vertexCount: number) {
+
+
     return `C${this.getBezierPoint(prevCoord,true,vertexCount)},${this.getBezierPoint(currentCoord,false,vertexCount)},${currentCoord}`
 
     // prevBezier = `${prevCoordX + (0.3 * (currentCoordX - prevCoordX))},${prevCoordY + (0.3 * (currentCoordY - prevCoordY))}`
@@ -134,7 +136,6 @@ export default class App extends Component<Props, State> {
     output += this.getBezierString(bloomedVertices[bloomedVertices.length - 1], bloomedVertices[0], vertexCount)
     return output
   }
-
 
   generatePathStraight (vertices: string []) {
     let output = `M${vertices[0]} `

@@ -19,7 +19,6 @@ interface State {
 
 }
 
-
 export default class SettingsPanel extends Component<Props, State> {
 
   
@@ -31,7 +30,6 @@ export default class SettingsPanel extends Component<Props, State> {
       <div className="settings_panel">
         <div>
           <Provider theme={defaultTheme} colorScheme="light"> 
-
             <Slider
               minValue={0.1}
               maxValue={0.7}
@@ -56,10 +54,8 @@ export default class SettingsPanel extends Component<Props, State> {
               aria-label='vertex_count'
             />
           </Provider>
-   
         </div>
       </div>
     )
   }
-
 }
