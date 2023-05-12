@@ -11,7 +11,9 @@ interface Props {
 
 interface State {
   bloomFactor: number,
-  vertexCount: number
+  vertexCount: number,
+  displaySharp: boolean,
+  bloomedVertices: string []
 }
 
 export default class App extends Component<Props, State> {
@@ -20,10 +22,17 @@ export default class App extends Component<Props, State> {
     super(props);
     this.state = {
       bloomFactor: 0.1,
-      vertexCount: 3
+      vertexCount: 3,
+      displaySharp: false,
+      bloomedVertices: ['']
     };
     this.setBloomFactor = this.setBloomFactor.bind(this)
     this.setVertexCount = this.setVertexCount.bind(this)
+    this.setSharp = this.setSharp.bind(this)
+  }
+
+  componentDidMount(): void {
+    this.setBloomedVertices(null,null)
   }
 
   bloom (coord: string, maxBloom: number): string {
@@ -45,15 +54,34 @@ export default class App extends Component<Props, State> {
   }
 
   getBezierPoint(currentCoord: string, clockwise: boolean, vertexCount: number): string {
+
+    // we want the bezier curve points to be in a perpendicular line from the vertex -> center.
+    // org gradient = rise/run
+    // (g) perpendiular gradient  = -1/g
+    // pythagoras theorem: 
+    // c = length of bezier line / 2
+    // b = ag
+    // a = ?
+    // therefor: a^2 + (ag)^2 = c^2
+    // solving for a we get: a = c/sqrt(1+g^2)
+    // a = change in x
+    // g*a = change in y
+
+    // we can use the nagative or positive version shown
+    // below based on the vertex y pos and direction (then rounded to 2 decimal places)
+
     const centerX: number = 50;
     const centerY: number = 50;
     const currentCoordX = parseInt(currentCoord.split(',')[0]);
     const currentCoordY = parseInt(currentCoord.split(',')[1]);
 
     const slop: number = (centerY-currentCoordY)/(centerX-currentCoordX);
+    
+    const distanceFromCenter = Math.floor(Math.sqrt(Math.pow((centerY-currentCoordY),2) + Math.pow((centerX-currentCoordX),2)))
 
     const perpendicularSlop: number = Math.round(-(1/slop) * 100) / 100;
-    const c = 20 - vertexCount;   // length of bezier line (half) // segements increase, this number should reduce
+    const c = 20 - vertexCount   // length of bezier line (half) // segements increase, this number should reduce
+    // const c = (distanceFromCenter * 2) / vertexCount\
     const a = c/Math.sqrt(1+Math.pow(perpendicularSlop,2));
 
     if (currentCoordY < 50 && clockwise || currentCoordY >= 50 && !clockwise) {
@@ -63,7 +91,6 @@ export default class App extends Component<Props, State> {
   }
 
   getBezierString (prevCoord: string, currentCoord: string, vertexCount: number) {
-
 
     return `C${this.getBezierPoint(prevCoord,true,vertexCount)},${this.getBezierPoint(currentCoord,false,vertexCount)},${currentCoord}`
 
@@ -128,35 +155,52 @@ export default class App extends Component<Props, State> {
   generatePath (bloomedVertices: string []) {
     let output = `M${bloomedVertices[0]} `
     const vertexCount = bloomedVertices.length;
- 
     for (let i = 1; i < bloomedVertices.length; i++) {
       output += this.getBezierString(bloomedVertices[i-1], bloomedVertices[i], vertexCount) + ' '
     }
-
     output += this.getBezierString(bloomedVertices[bloomedVertices.length - 1], bloomedVertices[0], vertexCount)
     return output
   }
 
   generatePathStraight (vertices: string []) {
     let output = `M${vertices[0]} `
- 
     for (let i = 1; i < vertices.length; i++) {
       output += 'L' + vertices[i] + ' '
     }
-    
     output += 'Z'
     return output
   }
 
-  setBloomFactor (factor: number) {
+  setBloomFactor (bloomFactor: number) {
+    this.setBloomedVertices(bloomFactor, null)
     this.setState({
-      bloomFactor: factor
+      bloomFactor: bloomFactor
     })
   }
 
   setVertexCount (vertexCount: number) {
+    this.setBloomedVertices(null, vertexCount)
     this.setState({
       vertexCount: vertexCount
+    })
+  }
+
+  setSharp () {
+    const { displaySharp } = this.state;
+    this.setState({
+      displaySharp: !displaySharp
+    })
+  }
+
+  setBloomedVertices (aBloomFactor: number | null, aVertexCount: number | null) {
+    const { bloomFactor, vertexCount } = this.state;
+
+    const bloomedVertices = this.getVertexCoords(aVertexCount ? aVertexCount : vertexCount).map(vertex => {
+      return this.bloom(vertex, aBloomFactor ? aBloomFactor : bloomFactor)
+    })
+
+    this.setState({
+      bloomedVertices: bloomedVertices
     })
   }
 
@@ -179,18 +223,14 @@ export default class App extends Component<Props, State> {
   }
 
   render () {
-    const { bloomFactor, vertexCount } = this.state;
-
-    const bloomedVertices = this.getVertexCoords(vertexCount).map(vertex => {
-      return this.bloom(vertex, bloomFactor)
-    })
+    const { bloomedVertices, displaySharp } = this.state;
 
     return (
       <div className="App">
         <div className='main'>
           {/* <SVGDisplay dPath={this.generatePathStraight(bloomedVertices)} point={this.getCircle(bloomedVertices[0],bloomedVertices[1])}/> */}
-          <SVGDisplay dPath={this.generatePath(bloomedVertices)}/>
-          <SettingsPanel setBloomFactor={this.setBloomFactor} setVertexCount={this.setVertexCount}/>
+          <SVGDisplay dPath={displaySharp ? this.generatePathStraight(bloomedVertices) : this.generatePath(bloomedVertices)}/>
+          <SettingsPanel setBloomFactor={this.setBloomFactor} setVertexCount={this.setVertexCount} setSharp={this.setSharp}/>
         </div>
       </div> 
     )

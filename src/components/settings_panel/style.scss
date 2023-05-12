@@ -5,6 +5,7 @@
     top: 0;
     height: 100%;
     position: relative;
+    // background-color: aquamarine;
 
     @media screen and (max-width: 840px) {
        width: 100%;
@@ -12,8 +13,9 @@
     }
 
     > div {
+        // background-color: antiquewhite;
         height: 200px;
-        width: 192px;
+        width: 250px;
         padding: 10px;
         position: absolute;
         margin: auto;
@@ -26,6 +28,32 @@
         @media screen and (max-width: 840px) {
             -ms-transform: none;
             transform: none;
-         }
+        }
+
+        > .general-button {
+            cursor: pointer;
+            background-color: #8e4700;
+            color: #ffe4c4;
+            box-shadow: 2px 2px #999;
+            border: none;
+            &:active {
+                background-color: red;
+                transform: translateY(2px);
+                transform: translateX(2px);
+                box-shadow: none;
+            }
+
+            &:hover {
+                background-color: #c60;
+            }
+        }
+         
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    button:focus {
+        outline: none;
     }
 }
