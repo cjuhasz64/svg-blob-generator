@@ -1,9 +1,23 @@
 .svg_display {
-    // background-color: lightgreen;
-    border-radius: 10px;
-    height: 500px;
     float: left;
+    position: relative;
+    width: 500px; 
+    height: 500px; 
+    
     @media screen and (max-width: 840px) {
 
+    }
+
+    > .svg_canvas {
+        background-color: antiquewhite;
+        width: 500px; 
+        height: 500px; 
+        position: absolute;
+    }
+
+    > .svg_overlay {
+        width: 500px; 
+        height: 500px; 
+        position: absolute;
     }
 }

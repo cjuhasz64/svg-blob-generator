@@ -6,11 +6,13 @@ import { Slider, Stack, FormControlLabel, Checkbox,Typography, styled, CheckboxP
 interface Props {
   setBloomFactor: (args1: number) => void,
   setVertexCount: (args1: number) => void,
-  setSharp: () => void
+  setSharp: () => void,
+  setEdit: () => void
 }
 
 interface State {
-  sharpChecked: boolean
+  sharpChecked: boolean,
+  editChcked: boolean
 }
 
 export default class SettingsPanel extends Component<Props, State> {
@@ -18,13 +20,14 @@ export default class SettingsPanel extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      sharpChecked: false
+      sharpChecked: false,
+      editChcked: false
     };
   }
 
   render() {
-    const { setBloomFactor, setVertexCount, setSharp } = this.props;
-    const { sharpChecked } = this.state;
+    const { setBloomFactor, setVertexCount, setSharp, setEdit } = this.props;
+    const { sharpChecked,editChcked } = this.state;
 
     // using MUI's Example
     const BpIcon = styled('span')(() => ({
@@ -142,13 +145,25 @@ export default class SettingsPanel extends Component<Props, State> {
           </svg>
           </Stack>
           <FormControlLabel 
-            control={ <BpCheckbox onClick={() => setSharp()} checked={sharpChecked}/>} 
+            control={ <BpCheckbox onClick={() => setSharp()} checked={editChcked}/>} 
             label= {
               <Typography 
                 sx={{ fontWeight: 'bold', fontSize: 13, paddingTop: 0.2}}
                 color="#8e4700"
                 >
                 SHARP
+              </Typography>
+            } 
+            onClick={() => this.setState({editChcked:!editChcked })}
+          />
+          <FormControlLabel 
+            control={ <BpCheckbox onClick={() => setEdit()} checked={sharpChecked}/>} 
+            label= {
+              <Typography 
+                sx={{ fontWeight: 'bold', fontSize: 13, paddingTop: 0.2}}
+                color="#8e4700"
+                >
+                EDIT
               </Typography>
             } 
             onClick={() => this.setState({sharpChecked:!sharpChecked })}
