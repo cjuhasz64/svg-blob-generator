@@ -75,7 +75,9 @@ export default class Vertex {
     return `${Math.round((currentCoordX - a) * 100) / 100},${Math.round((currentCoordY - (a*perpendicularSlop)) * 100) / 100}` 
   }
 
-  public getCoordsString () {
+  public getCoordsString (direction?: 'cw' | 'ccw'): string{
+    if (direction === 'cw') return this.cwBezierPoint
+    if (direction === 'ccw') return this.ccwBezierPoint
     return `${this.x},${this.y}`;
   }
 
@@ -91,16 +93,43 @@ export default class Vertex {
     this.ccwBezierPoint = this.getBezierPoint(`${this.x},${this.y}`, false, this.vertexCount)
   } 
 
-  public setX (x: number) {
+  private setX (x: number): void {
     this.x = x;
   }
 
-  public setY (y: number) {
+  private setY (y: number): void  {
     this.y = y;
   }
 
-  public setCoords (coords: string) {
+  private setCWX (x: number): void  {
+    this.cwBezierPoint = this.cwBezierPoint.replace(this.cwBezierPoint.split(',')[0], x.toString())
+  }
+
+  private setCWY (y: number): void  {
+    this.cwBezierPoint = this.cwBezierPoint.replace(this.cwBezierPoint.split(',')[1], y.toString())
+  }
+
+  private setCCWX (x: number): void  {
+    this.ccwBezierPoint = this.ccwBezierPoint.replace(this.ccwBezierPoint.split(',')[0], x.toString())
+  }
+
+  private setCCWY (y: number): void  {
+    this.ccwBezierPoint = this.ccwBezierPoint.replace(this.ccwBezierPoint.split(',')[1], y.toString())
+  }
+
+
+  public setCoords (coords: string): void  {
     this.setX(parseInt(coords.split(',')[0]));
     this.setY(parseInt(coords.split(',')[1]));
+  }
+
+  public setCWCoords (coords: string): void  {
+    this.setCWX(parseInt(coords.split(',')[0]));
+    this.setCWY(parseInt(coords.split(',')[1]));
+  }
+
+  public setCCWCoords (coords: string): void  {
+    this.setCCWX(parseInt(coords.split(',')[0]));
+    this.setCCWY(parseInt(coords.split(',')[1]));
   }
 }

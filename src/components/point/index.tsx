@@ -6,7 +6,8 @@ const POS_MULTIPLE = 5;
 
 interface Props {
   vertex: Vertex,
-  setCurrentDragging: (args1: Vertex) => void
+  setCurrentDragging: (args1: Vertex, args2: 'cw' | 'ccw') => void,
+  direction?: 'cw' | 'ccw'
 }
 
 interface State {
@@ -31,19 +32,39 @@ export default class Point extends Component<Props, State> {
   }
 
   render() {
-    const { vertex, setCurrentDragging } = this.props; 
+    const { vertex, setCurrentDragging, direction } = this.props; 
 
-    const posX = vertex.x * POS_MULTIPLE;
-    const posY = vertex.y * POS_MULTIPLE; 
-   
+    let posX, posY: number 
+
+    if (direction === 'cw') {
+      posX = parseInt(vertex.cwBezierPoint.split(',')[0]) * POS_MULTIPLE;
+      posY = parseInt(vertex.cwBezierPoint.split(',')[1]) * POS_MULTIPLE; 
+    } else if (direction === 'ccw') {
+      posX = parseInt(vertex.ccwBezierPoint.split(',')[0]) * POS_MULTIPLE;
+      posY = parseInt(vertex.ccwBezierPoint.split(',')[1]) * POS_MULTIPLE; 
+    } else {
+      posX = vertex.x * POS_MULTIPLE;
+      posY = vertex.y * POS_MULTIPLE; 
+    }
+
     return (
       <div 
         className="point" 
-        style={{  transform: `translate(${posX - 4}px,${posY - 4}px)` }}
-        onMouseDown={() => setCurrentDragging(vertex)}
+        style={{  
+          transform: `translate(${posX - 4}px,${posY - 4}px)`, 
+          backgroundColor: direction ? 'red' : 'blue',
+          width: direction ? '4px' : '8px',
+          height:  direction ? '4px' : '8px',
+          borderRadius: direction ? '4px' : '8px'
+        }}
+        onMouseDown={() => setCurrentDragging(vertex, direction!)}
         >
        
       </div>
     )
   }
 }
+
+// width: 8px;
+// height: 8px;
+// border-radius: 8px;

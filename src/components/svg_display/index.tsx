@@ -12,7 +12,7 @@ interface Props {
 
 interface State {
   vertices: Vertex [], 
-  currentDragging: Vertex | null
+  currentDragging: [ Vertex | null, 'cw' | 'ccw' | null ]
 }
 
 export default class SVGDisplay extends Component<Props, State> {
@@ -21,7 +21,7 @@ export default class SVGDisplay extends Component<Props, State> {
     super(props);
     this.state = {
       vertices: props.vertices,
-      currentDragging: null
+      currentDragging: [null, null]
     };
     this.updateVertexCoords = this.updateVertexCoords.bind(this);
     this.setCurrentDragging = this.setCurrentDragging.bind(this);
@@ -67,12 +67,20 @@ export default class SVGDisplay extends Component<Props, State> {
     return null;
   }
 
-  updateVertexCoords (aVertex: Vertex, coords: string): void {
+  updateVertexCoords (aVertex: [Vertex | null, 'cw' | 'ccw' | null], coords: string): void {
     const { vertices } = this.state;
+    const direction: 'cw' | 'ccw' | null = aVertex[1]
+
     this.setState({
       vertices: vertices.map(vertex => {
-        if (vertex === aVertex) {
-          vertex.setCoords(coords);
+        if (vertex === aVertex[0]) {
+          if (direction === 'cw') {
+            vertex.setCWCoords(coords);
+          } else if (direction === 'ccw') {
+            vertex.setCCWCoords(coords);
+          } else {
+            vertex.setCoords(coords);
+          }
           return vertex
         }
         return vertex
@@ -80,9 +88,9 @@ export default class SVGDisplay extends Component<Props, State> {
     })
   }
 
-  setCurrentDragging (vertex: Vertex | null) {
+  setCurrentDragging (vertex: Vertex | null, direction?: 'cw' | 'ccw') {
     this.setState({
-      currentDragging: vertex
+      currentDragging: [vertex, direction ? direction : null]
     })
   }
 
@@ -112,15 +120,27 @@ export default class SVGDisplay extends Component<Props, State> {
           {
             isEdit ? 
               vertices.map(element => {
-                return <Point 
-                  vertex={element}
-                  setCurrentDragging={this.setCurrentDragging}
-                /> 
+                return <Point vertex={element} setCurrentDragging={this.setCurrentDragging} />   
               })
             : null
-          }
+          } 
+          {
+            isEdit ? 
+              vertices.map(element => {
+                return <Point vertex={element} setCurrentDragging={this.setCurrentDragging} direction='cw'/>   
+              })
+            : null
+          } 
+          {
+            isEdit ? 
+              vertices.map(element => {
+                return <Point vertex={element} setCurrentDragging={this.setCurrentDragging} direction='ccw'/>   
+              })
+            : null
+          } 
         </div>
       </div>
     )
   }
 }
+
