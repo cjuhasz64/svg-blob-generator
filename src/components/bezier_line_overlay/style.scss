@@ -1,0 +1,7 @@
+.bezier_line_overlay {
+    width: 500px; 
+    height: 500px; 
+    position: absolute;
+    z-index: 20;
+    pointer-events: none
+}

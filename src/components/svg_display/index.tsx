@@ -3,6 +3,7 @@ import { Component } from 'react';
 import './style.scss';
 import Point from '../point';
 import Vertex from '../../util/vertex';
+import BezierLineOverlay from '../bezier_line_overlay';
 
 interface Props {
   vertices: Vertex [],
@@ -103,6 +104,7 @@ export default class SVGDisplay extends Component<Props, State> {
         onMouseUp={e => this.setCurrentDragging(null)}
         onMouseLeave={e => this.setCurrentDragging(null)}
       >
+        <BezierLineOverlay vertices={vertices} isEdit={isEdit}/>
         <div className="svg_canvas">
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1" width={500} height={500}>
             <path

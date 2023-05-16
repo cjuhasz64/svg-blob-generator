@@ -52,19 +52,15 @@ export default class Point extends Component<Props, State> {
         className="point" 
         style={{  
           transform: `translate(${posX - 4}px,${posY - 4}px)`, 
-          backgroundColor: direction ? 'red' : 'blue',
-          width: direction ? '4px' : '8px',
-          height:  direction ? '4px' : '8px',
-          borderRadius: direction ? '4px' : '8px'
+          backgroundColor: 'black',
+          width: '8px',
+          height: '8px',
+          borderRadius: '8px',
+          opacity: '0.5'
         }}
         onMouseDown={() => setCurrentDragging(vertex, direction!)}
         >
-       
       </div>
     )
   }
 }
-
-// width: 8px;
-// height: 8px;
-// border-radius: 8px;
