@@ -1,5 +1,10 @@
 import { Component } from 'react';
 import './style.scss';
+import threeVertices from '../../images/3vertices.png'
+import eightVertices from '../../images/8vertices.png'
+
+import ctrlKey from '../../images/svgs/ctrl-control-button-icon.svg'
+import altKey from '../../images/svgs/alt-button-icon.svg'
 
 import { Slider, Stack, FormControlLabel, Checkbox,Typography, styled, CheckboxProps, Button } from '@mui/material';
 
@@ -7,7 +12,8 @@ interface Props {
   setBloomFactor: (args1: number) => void,
   setVertexCount: (args1: number) => void,
   setSharp: () => void,
-  setEdit: () => void
+  setEdit: () => void,
+  renderNewShape: (agrs1 :number | null, agrs2: number | null) => void
 }
 
 interface State {
@@ -26,7 +32,7 @@ export default class SettingsPanel extends Component<Props, State> {
   }
 
   render() {
-    const { setBloomFactor, setVertexCount, setSharp, setEdit } = this.props;
+    const { setBloomFactor, setVertexCount, setSharp, setEdit, renderNewShape } = this.props;
     const { sharpChecked,editChcked } = this.state;
 
     // using MUI's Example
@@ -74,8 +80,40 @@ export default class SettingsPanel extends Component<Props, State> {
     return (
       <div className="settings_panel">
         <div>
+          <div className='title'><span>VERTICES</span></div>
+          <div className='info-row'>
+            <span> Default: Free Move </span>
+          </div>
+          <div className='info-row'>
+            <img src={ctrlKey} alt="ctrl" width={30}/>
+            <span> Auto Bezier </span>
+            
+          </div>
+          <div className='info-row'>
+            <img src={altKey} alt="ctrl" width={30} />
+            <span> Static Bezier </span>
+          </div>
+
+          <div className='title' style={{paddingTop: 15}}><span>BEZIER POINTS</span></div>
+          <div className='info-row'>
+            <span> Default: Mirror </span>
+          </div>
+          <div className='info-row'>
+            <img src={ctrlKey} alt="ctrl" width={30}/>
+            <span> Inline</span>
+            
+          </div>
+          <div className='info-row'>
+            <img src={altKey} alt="ctrl" width={30} />
+            <span> Free Move</span>
+          </div>
+          
+        </div>
+
+        
+        <div>
           <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
-            <div>O</div>
+            <div><img src={threeVertices} alt="Italian Trulli"/></div>
             <Slider
               size="small"
               defaultValue={3}
@@ -98,7 +136,7 @@ export default class SettingsPanel extends Component<Props, State> {
               }}
               onChange={(e, val) => setVertexCount(val as number)}
             />
-            <div>O</div>
+            <div><img src={eightVertices} alt="Italian Trulli"/></div>
           </Stack>
           <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1" width={50}>
@@ -145,7 +183,7 @@ export default class SettingsPanel extends Component<Props, State> {
           </svg>
           </Stack>
           <FormControlLabel 
-            control={ <BpCheckbox onClick={() => setSharp()} checked={editChcked}/>} 
+            control={ <BpCheckbox onClick={() => {setSharp(); this.setState({editChcked:!editChcked })}} checked={editChcked}/>} 
             label= {
               <Typography 
                 sx={{ fontWeight: 'bold', fontSize: 13, paddingTop: 0.2}}
@@ -154,10 +192,9 @@ export default class SettingsPanel extends Component<Props, State> {
                 SHARP
               </Typography>
             } 
-            onClick={() => this.setState({editChcked:!editChcked })}
           />
           <FormControlLabel 
-            control={ <BpCheckbox onClick={() => setEdit()} checked={sharpChecked}/>} 
+            control={ <BpCheckbox onClick={() => {setEdit(); this.setState({sharpChecked:!sharpChecked })}} checked={sharpChecked}/>} 
             label= {
               <Typography 
                 sx={{ fontWeight: 'bold', fontSize: 13, paddingTop: 0.2}}
@@ -166,9 +203,9 @@ export default class SettingsPanel extends Component<Props, State> {
                 EDIT
               </Typography>
             } 
-            onClick={() => this.setState({sharpChecked:!sharpChecked })}
           />
-          <button className='general-button'>SVG</button>
+          <button className='general-button' onClick={() => navigator.clipboard.writeText(document.getElementsByClassName('svg_canvas')[0].innerHTML)}>SVG</button>
+          <button className='general-button' onClick={() => renderNewShape(null,null)} style={{ marginLeft: '12px'}}>NEW</button>
         </div>
       </div>
     )

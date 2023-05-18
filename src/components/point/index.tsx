@@ -2,7 +2,7 @@ import { Component } from 'react';
 import './style.scss';
 import Vertex from '../../util/vertex';
 
-const POS_MULTIPLE = 5;
+const POS_MULTIPLE = 5.00;
 
 interface Props {
   vertex: Vertex,
@@ -37,11 +37,11 @@ export default class Point extends Component<Props, State> {
     let posX, posY: number 
 
     if (direction === 'cw') {
-      posX = parseInt(vertex.cwBezierPoint.split(',')[0]) * POS_MULTIPLE;
-      posY = parseInt(vertex.cwBezierPoint.split(',')[1]) * POS_MULTIPLE; 
+      posX = parseFloat(vertex.cwBezierPoint.split(',')[0]) * POS_MULTIPLE;
+      posY = parseFloat(vertex.cwBezierPoint.split(',')[1]) * POS_MULTIPLE; 
     } else if (direction === 'ccw') {
-      posX = parseInt(vertex.ccwBezierPoint.split(',')[0]) * POS_MULTIPLE;
-      posY = parseInt(vertex.ccwBezierPoint.split(',')[1]) * POS_MULTIPLE; 
+      posX = parseFloat(vertex.ccwBezierPoint.split(',')[0]) * POS_MULTIPLE;
+      posY = parseFloat(vertex.ccwBezierPoint.split(',')[1]) * POS_MULTIPLE; 
     } else {
       posX = vertex.x * POS_MULTIPLE;
       posY = vertex.y * POS_MULTIPLE; 
@@ -56,7 +56,7 @@ export default class Point extends Component<Props, State> {
           width: '8px',
           height: '8px',
           borderRadius: '8px',
-          opacity: '0.5'
+          opacity: '0.3'
         }}
         onMouseDown={() => setCurrentDragging(vertex, direction!)}
         >

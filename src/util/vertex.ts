@@ -18,24 +18,28 @@
     // return `${x + (randomBloomPercetage * xDiff)},${y + (randomBloomPercetage * yDiff)}`
 export default class Vertex {
 
-  readonly centerX: number = 50;
-  readonly centerY: number = 50;
+  public centerCoords: string = '50,50'
 
   public x: number;
   public y: number;
   private vertexCount: number;
 
+  private initialPos: string;
+  private initialCWPos: string;
+  private initialCCWPos: string;
+
   public cwBezierPoint: string;
   public ccwBezierPoint: string;
 
-  constructor(xCoord: number, yCoord: number, vertexCount: number, ) {
+  constructor(xCoord: number, yCoord: number, vertexCount: number) {
     this.x=xCoord;
     this.y=yCoord;
     this.vertexCount = vertexCount;
-
+    this.initialPos = `${xCoord},${yCoord}`
     this.cwBezierPoint = this.getBezierPoint(`${xCoord},${yCoord}`, true, vertexCount);
     this.ccwBezierPoint = this.getBezierPoint(`${xCoord},${yCoord}`, false, vertexCount)
-
+    this.initialCWPos = this.cwBezierPoint
+    this.initialCCWPos = this.ccwBezierPoint
   }
 
   private getBezierPoint(currentCoord: string, clockwise: boolean, vertexCount: number): string {
@@ -55,21 +59,31 @@ export default class Vertex {
     // we can use the nagative or positive version shown
     // below based on the vertex y pos and direction (then rounded to 2 decimal places)
 
-    const centerX: number = 50;
-    const centerY: number = 50;
-    const currentCoordX = parseInt(currentCoord.split(',')[0]);
-    const currentCoordY = parseInt(currentCoord.split(',')[1]);
+    const currentCoordX = parseFloat(currentCoord.split(',')[0]);
+    const currentCoordY = parseFloat(currentCoord.split(',')[1]);
+
+    const centerX = parseFloat(this.centerCoords.split(',')[0]);
+    const centerY = parseFloat(this.centerCoords.split(',')[1]);
 
     const slop: number = (centerY-currentCoordY)/(centerX-currentCoordX);
-    
+
     const distanceFromCenter = Math.floor(Math.sqrt(Math.pow((centerY-currentCoordY),2) + Math.pow((centerX-currentCoordX),2)))
 
-    const perpendicularSlop: number = Math.round(-(1/slop) * 100) / 100;
+    const perpendicularSlop: number = -(1/slop);
     const c = 20 - vertexCount   // length of bezier line (half) // segements increase, this number should reduce
     // const c = (distanceFromCenter * 2) / vertexCount\
     const a = c/Math.sqrt(1+Math.pow(perpendicularSlop,2));
 
-    if (currentCoordY < 50 && clockwise || currentCoordY >= 50 && !clockwise) {
+
+    // below lines could be optimised
+    if (currentCoordY === centerX) {
+      if (currentCoordX <= centerX && clockwise || currentCoordX > centerX && !clockwise) {
+        return `${currentCoordX},${Math.round((currentCoordY - (c)) * 100) / 100}` 
+      }
+      return `${currentCoordX},${Math.round((currentCoordY + (c)) * 100) / 100}` 
+    }
+
+    if (currentCoordY < centerY && clockwise || currentCoordY > centerY && !clockwise) {
       return `${Math.round((currentCoordX + a) * 100) / 100},${Math.round((currentCoordY + (a*perpendicularSlop)) * 100) / 100}` 
     } 
     return `${Math.round((currentCoordX - a) * 100) / 100},${Math.round((currentCoordY - (a*perpendicularSlop)) * 100) / 100}` 
@@ -82,16 +96,23 @@ export default class Vertex {
   }
 
   public bloom (bloomFactor: number) {
-    const xDiff = this.centerX - this.x;
-    const yDiff = this.centerY - this.y;
+    const centerX = parseFloat(this.centerCoords.split(',')[0]);
+    const centerY = parseFloat(this.centerCoords.split(',')[1]);
+
+    const xDiff = centerX - this.x;
+    const yDiff = centerY - this.y;
     const randomBloomPercetage = Math.round(Math.random() * (bloomFactor) * 100) / 100
 
     this.x += (randomBloomPercetage * xDiff)
     this.y += (randomBloomPercetage * yDiff)
+    this.initialPos =`${this.x},${this.y}`
+    this.resetBezier()
+  } 
 
+  public resetBezier (): void {
     this.cwBezierPoint = this.getBezierPoint(`${this.x},${this.y}`, true, this.vertexCount)
     this.ccwBezierPoint = this.getBezierPoint(`${this.x},${this.y}`, false, this.vertexCount)
-  } 
+  }
 
   private setX (x: number): void {
     this.x = x;
@@ -101,35 +122,70 @@ export default class Vertex {
     this.y = y;
   }
 
-  private setCWX (x: number): void  {
-    this.cwBezierPoint = this.cwBezierPoint.replace(this.cwBezierPoint.split(',')[0], x.toString())
-  }
+  public setCoords (coords: string, event: React.MouseEvent<HTMLDivElement, MouseEvent>, autoSetBezier: boolean): void  {
+    this.setX(parseFloat(coords.split(',')[0]));
+    this.setY(parseFloat(coords.split(',')[1]));
 
-  private setCWY (y: number): void  {
-    this.cwBezierPoint = this.cwBezierPoint.replace(this.cwBezierPoint.split(',')[1], y.toString())
-  }
+    if (event.ctrlKey) { // ctrl: move point independently
+      if (autoSetBezier) this.resetBezier() // if we move all vertices, beziers arent auto set
+    } 
 
-  private setCCWX (x: number): void  {
-    this.ccwBezierPoint = this.ccwBezierPoint.replace(this.ccwBezierPoint.split(',')[0], x.toString())
-  }
-
-  private setCCWY (y: number): void  {
-    this.ccwBezierPoint = this.ccwBezierPoint.replace(this.ccwBezierPoint.split(',')[1], y.toString())
-  }
-
-
-  public setCoords (coords: string): void  {
-    this.setX(parseInt(coords.split(',')[0]));
-    this.setY(parseInt(coords.split(',')[1]));
+    if (event.altKey) {
+      
+    }
   }
 
   public setCWCoords (coords: string): void  {
-    this.setCWX(parseInt(coords.split(',')[0]));
-    this.setCWY(parseInt(coords.split(',')[1]));
+    this.cwBezierPoint = coords
   }
 
   public setCCWCoords (coords: string): void  {
-    this.setCCWX(parseInt(coords.split(',')[0]));
-    this.setCCWY(parseInt(coords.split(',')[1]));
+    this.ccwBezierPoint = coords
   }
+
+  public getOffsetCoords (offsetAmount: string): string {
+    
+    const xOffset = parseFloat(offsetAmount.split(',')[0])
+    const yOffset = parseFloat(offsetAmount.split(',')[1])
+
+    const newX = Math.round((parseFloat(this.initialPos.split(',')[0]) + xOffset) * 100) / 100
+    const newY = Math.round((parseFloat(this.initialPos.split(',')[1]) + yOffset) * 100) / 100
+    
+    
+    return `${newX},${newY}`;
+  }
+
+  public getCWOffsetCoords (offsetAmount: string): string {
+    
+    const xOffset = parseFloat(offsetAmount.split(',')[0])
+    const yOffset = parseFloat(offsetAmount.split(',')[1])
+
+    const newX = Math.round((parseFloat(this.initialCWPos.split(',')[0]) + xOffset) * 100) / 100
+    const newY = Math.round((parseFloat(this.initialCWPos.split(',')[1]) + yOffset) * 100) / 100
+    
+    
+    return `${newX},${newY}`;
+  }
+
+  public getCCWOffsetCoords (offsetAmount: string): string {
+    
+    const xOffset = parseFloat(offsetAmount.split(',')[0])
+    const yOffset = parseFloat(offsetAmount.split(',')[1])
+
+    const newX = Math.round((parseFloat(this.initialCCWPos.split(',')[0]) + xOffset) * 100) / 100
+    const newY = Math.round((parseFloat(this.initialCCWPos.split(',')[1]) + yOffset) * 100) / 100
+    
+    return `${newX},${newY}`;
+  }
+
+  public saveCurrentAsInitial() {
+    this.initialPos = `${this.x},${this.y}`;
+    this.initialCWPos = this.cwBezierPoint;
+    this.initialCCWPos = this.ccwBezierPoint;
+  }
+
+  public setCenterCoords(coords: string): void {
+    this.centerCoords = coords
+  }
+
 }

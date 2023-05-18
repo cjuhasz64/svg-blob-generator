@@ -8,7 +8,6 @@ import SettingsPanel from './components/settings_panel';
 import Vertex from './util/vertex';
 
 interface Props {
-
 }
 
 interface State {
@@ -16,7 +15,6 @@ interface State {
   vertexCount: number,
   displaySharp: boolean,
   displayEdit: boolean,
-  // bloomedVertices: string [],
   vertices: Vertex []
 }
 
@@ -43,72 +41,12 @@ export default class App extends Component<Props, State> {
     this.setVertexCount = this.setVertexCount.bind(this);
     this.setSharp = this.setSharp.bind(this);
     this.setEdit = this.setEdit.bind(this);
+    this.setNewVertices = this.setNewVertices.bind(this);
+
   }
 
   componentDidMount(): void { 
   }
-
-  // getBezierString (prevCoord: string, currentCoord: string, vertexCount: number) {
-
-  //   return `C${this.getBezierPoint(prevCoord,true,vertexCount)},${this.getBezierPoint(currentCoord,false,vertexCount)},${currentCoord}`
-
-    // prevBezier = `${prevCoordX + (0.3 * (currentCoordX - prevCoordX))},${prevCoordY + (0.3 * (currentCoordY - prevCoordY))}`
-    // currentBezier = `${prevCoordX + (0.7 * (currentCoordX - prevCoordX))},${prevCoordY + (0.7 * (currentCoordY - prevCoordY))}`
-
-    // const majorFactor = 20 - (vertexCount)
-    // const majorFactor = (4/3)*Math.tan(3.14/(2 * vertexCount))
-
-    // const majorFactor = 15
-
-    // // get prev bezier
-    // if (prevCoordX < 50 && prevCoordY < 50) {
-    //   // top left
-    //   prevBezier = `${prevCoordX + majorFactor},${prevCoordY - majorFactor}`
-    // } else if (prevCoordX > 50 && prevCoordY < 50) {
-    //   // top right
-    //   prevBezier = `${prevCoordX + majorFactor},${prevCoordY + majorFactor}`
-    // } else if (prevCoordX > 50 && prevCoordY > 50) {
-    //   // bottom right
-    //   prevBezier = `${prevCoordX - majorFactor},${prevCoordY + majorFactor}`
-    // } else if (prevCoordX < 50 && prevCoordY > 50) {
-    //   // bottom left   
-    //   prevBezier = `${prevCoordX - majorFactor},${prevCoordY - majorFactor}`
-    // } else if (prevCoordX === 50) {
-    //   if (prevCoordY > 50) {
-    //     // bottom to left
-    //     prevBezier = `${prevCoordX - majorFactor},${prevCoordY}`
-    //   } else {
-    //     // top to right
-    //     prevBezier = `${prevCoordX + majorFactor},${prevCoordY}`
-    //   }
-    // } else if (prevCoordY === 50) {
-
-    // }
-  
-    // if (currentCoordX < 50 && currentCoordY < 50) {
-    //   // top left
-    //   currentBezier = `${currentCoordX - majorFactor},${currentCoordY + majorFactor}`
-    // } else if (currentCoordX > 50 && currentCoordY < 50) {
-    //   // top right
-    //   currentBezier = `${currentCoordX - majorFactor},${currentCoordY - majorFactor}`
-    // } else if (currentCoordX > 50 && currentCoordY > 50) {
-    //   // bottom right
-    //   currentBezier = `${currentCoordX + majorFactor},${currentCoordY - majorFactor}`
-    // } else if (currentCoordX < 50 && currentCoordY > 50) {
-    //   // bottom left   
-    //   currentBezier = `${currentCoordX + majorFactor},${currentCoordY + majorFactor}`
-    // } else if (currentCoordX === 50) {
-    //   if (currentCoordY > 50) {
-    //     // bottom to right
-    //     currentBezier = `${currentCoordX + majorFactor},${currentCoordY}`
-    //   } else {
-    //     // bottom to left
-    //     currentBezier = `${currentCoordX - majorFactor},${currentCoordY}`
-    //   }
-    // } else if (currentCoordY === 50) {
-
-    // }
-  // }
 
   generatePath (vertices: Vertex []) {
     let output = `M${vertices[0].getCoordsString()}`
@@ -196,9 +134,9 @@ export default class App extends Component<Props, State> {
     return (
       <div className="App">
         <div className='main'>
-          {/* <SVGDisplay dPath={this.generatePath(vertices)} updateCoord={this.updateCoord}/> */}
-          <SVGDisplay vertices={vertices} isSharp={displaySharp} isEdit={displayEdit}/>
-          <SettingsPanel setBloomFactor={this.setBloomFactor} setVertexCount={this.setVertexCount} setSharp={this.setSharp} setEdit={this.setEdit}/>
+          <SVGDisplay vertices={vertices} isSharp={displaySharp} isEdit={displayEdit}/> 
+          {/* <div className='info'>dwd</div> */}
+          <SettingsPanel setBloomFactor={this.setBloomFactor} setVertexCount={this.setVertexCount} setSharp={this.setSharp} setEdit={this.setEdit} renderNewShape={this.setNewVertices}/>
         </div>
       </div> 
     )
