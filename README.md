@@ -3,6 +3,6 @@ SVG Blob Generator. Built with React, written in Typescript
 TODO:
  - Finish Controls
     - Change Color
-    - Reroll button
  - Export SVG
- - Edit is buggy
+ - Create Bezier "Inline" Function
+ - Need a solution for the boundries
