@@ -1,4 +1,5 @@
-SVG Blob Generator. Built with React, written in Typescript
+SVG Blob Generator, with some editing functionality. 
+Built with React, written in Typescript
 
 TODO:
  - Finish Controls
