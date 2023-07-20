@@ -45,9 +45,6 @@ export default class App extends Component<Props, State> {
 
   }
 
-  componentDidMount(): void { 
-  }
-
   generatePath (vertices: Vertex []) {
     let output = `M${vertices[0].getCoordsString()}`
     const vertexCount = vertices.length;
@@ -135,7 +132,6 @@ export default class App extends Component<Props, State> {
       <div className="App">
         <div className='main'>
           <SVGDisplay vertices={vertices} isSharp={displaySharp} isEdit={displayEdit}/> 
-          {/* <div className='info'>dwd</div> */}
           <SettingsPanel setBloomFactor={this.setBloomFactor} setVertexCount={this.setVertexCount} setSharp={this.setSharp} setEdit={this.setEdit} renderNewShape={this.setNewVertices}/>
         </div>
       </div> 

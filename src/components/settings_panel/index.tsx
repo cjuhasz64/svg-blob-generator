@@ -7,6 +7,7 @@ import ctrlKey from '../../images/svgs/ctrl-control-button-icon.svg'
 import altKey from '../../images/svgs/alt-button-icon.svg'
 
 import { Slider, Stack, FormControlLabel, Checkbox,Typography, styled, CheckboxProps, Button } from '@mui/material';
+import { PassThrough } from 'stream';
 
 interface Props {
   setBloomFactor: (args1: number) => void,
@@ -93,24 +94,21 @@ export default class SettingsPanel extends Component<Props, State> {
             <img src={altKey} alt="ctrl" width={30} />
             <span> Static Bezier </span>
           </div>
-
           <div className='title' style={{paddingTop: 15}}><span>BEZIER POINTS</span></div>
           <div className='info-row'>
             <span> Default: Mirror </span>
           </div>
           <div className='info-row'>
             <img src={ctrlKey} alt="ctrl" width={30}/>
-            <span> Inline</span>
+            <span style={{ textDecoration: 'line-through', color: 'red'}}> Inline </span>
             
           </div>
           <div className='info-row'>
             <img src={altKey} alt="ctrl" width={30} />
             <span> Free Move</span>
-          </div>
-          
+          </div>          
         </div>
 
-        
         <div>
           <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
             <div><img src={threeVertices} alt="Italian Trulli"/></div>
@@ -183,7 +181,7 @@ export default class SettingsPanel extends Component<Props, State> {
           </svg>
           </Stack>
           <FormControlLabel 
-            control={ <BpCheckbox onClick={() => {setSharp(); this.setState({editChcked:!editChcked })}} checked={editChcked}/>} 
+            control={ <BpCheckbox onClick={() => {setSharp(); this.setState({ editChcked:!editChcked })}} checked={editChcked}/>} 
             label= {
               <Typography 
                 sx={{ fontWeight: 'bold', fontSize: 13, paddingTop: 0.2}}
@@ -194,7 +192,7 @@ export default class SettingsPanel extends Component<Props, State> {
             } 
           />
           <FormControlLabel 
-            control={ <BpCheckbox onClick={() => {setEdit(); this.setState({sharpChecked:!sharpChecked })}} checked={sharpChecked}/>} 
+            control={ <BpCheckbox onClick={() => {setEdit(); this.setState({ sharpChecked:!sharpChecked })}} checked={sharpChecked}/>} 
             label= {
               <Typography 
                 sx={{ fontWeight: 'bold', fontSize: 13, paddingTop: 0.2}}

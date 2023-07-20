@@ -29,8 +29,6 @@ export default class SVGDisplay extends Component<Props, State> {
       initialCenter: '50,50'
     };
 
-
-
     this.updateVertexCoords = this.updateVertexCoords.bind(this);
     this.setCurrentDragging = this.setCurrentDragging.bind(this);
   }
@@ -65,7 +63,7 @@ export default class SVGDisplay extends Component<Props, State> {
     return null;
   }
 
-  updateVertexCoords (aVertex: [Vertex | null, 'cw' | 'ccw' | null], coords: string, event: React.MouseEvent<HTMLDivElement, MouseEvent>, autoSetBezier: boolean): void {
+  updateVertexCoords (aVertex: [Vertex | null, 'cw' | 'ccw' | null], coords: string, event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.WheelEvent<HTMLDivElement>, autoSetBezier: boolean): void {
     const { vertices, initialMousePos } = this.state;
     const direction: 'cw' | 'ccw' | null = aVertex[1]
 
@@ -80,14 +78,12 @@ export default class SVGDisplay extends Component<Props, State> {
             // default: opposite beizer mirros movement 
             vertex.setCWCoords(coords);
             if (autoSetBezier) {
-              const xOffset: number = parseFloat(this.getMouseCoords(event).split(',')[0]) - parseFloat(initialMousePos!.split(',')[0]) 
-              const yOffset: number = parseFloat(this.getMouseCoords(event).split(',')[1]) - parseFloat(initialMousePos!.split(',')[1])
+              const xOffset: number = parseFloat(this.getMouseCoords(event).split(',')[0]) - parseFloat(initialMousePos!.split(',')[0]);
+              const yOffset: number = parseFloat(this.getMouseCoords(event).split(',')[1]) - parseFloat(initialMousePos!.split(',')[1]);
               vertex.setCCWCoords(vertex.getCCWOffsetCoords(`${xOffset * -1},${yOffset * -1}`));
             }
           }
-          
         } else if (direction === 'ccw') {
-
           if (event.altKey) {
             // alt key: move bezier point alone
             vertex.setCCWCoords(coords);
@@ -95,16 +91,17 @@ export default class SVGDisplay extends Component<Props, State> {
             // default: opposite beizer mirros movement 
             vertex.setCCWCoords(coords);
             if (autoSetBezier) {
-              const xOffset: number = parseFloat(this.getMouseCoords(event).split(',')[0]) - parseFloat(initialMousePos!.split(',')[0]) 
-              const yOffset: number = parseFloat(this.getMouseCoords(event).split(',')[1]) - parseFloat(initialMousePos!.split(',')[1])
+              const xOffset: number = parseFloat(this.getMouseCoords(event).split(',')[0]) - parseFloat(initialMousePos!.split(',')[0]);
+              const yOffset: number = parseFloat(this.getMouseCoords(event).split(',')[1]) - parseFloat(initialMousePos!.split(',')[1]);
               vertex.setCWCoords(vertex.getCWOffsetCoords(`${xOffset * -1},${yOffset * -1}`));
             }
           }
 
         } else {
+
           if (event.altKey) {
-            const xOffset: number = parseFloat(this.getMouseCoords(event).split(',')[0]) - parseFloat(initialMousePos!.split(',')[0]) 
-            const yOffset: number = parseFloat(this.getMouseCoords(event).split(',')[1]) - parseFloat(initialMousePos!.split(',')[1])
+            const xOffset: number = parseFloat(this.getMouseCoords(event).split(',')[0]) - parseFloat(initialMousePos!.split(',')[0]); 
+            const yOffset: number = parseFloat(this.getMouseCoords(event).split(',')[1]) - parseFloat(initialMousePos!.split(',')[1]);
             vertex.setCWCoords(vertex.getCWOffsetCoords(`${xOffset},${yOffset}`));
             vertex.setCCWCoords(vertex.getCCWOffsetCoords(`${xOffset},${yOffset}`));
           }
@@ -131,7 +128,7 @@ export default class SVGDisplay extends Component<Props, State> {
     const {vertices} = this.state;
 
     vertices.forEach(vertex => {
-      vertex.saveCurrentAsInitial()
+      vertex.saveCurrentAsInitial();
     })
 
     if (!event) {
@@ -146,7 +143,7 @@ export default class SVGDisplay extends Component<Props, State> {
     })
   }
 
-  getMouseCoords (event: React.MouseEvent<HTMLDivElement, MouseEvent>): string {
+  getMouseCoords (event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.WheelEvent<HTMLDivElement>): string {
     const obj = document.getElementsByClassName('svg_display');
     const xOffset = obj[0].getBoundingClientRect().x;
     const yOffset = obj[0].getBoundingClientRect().y;
@@ -160,18 +157,48 @@ export default class SVGDisplay extends Component<Props, State> {
 
     if (!initialMousePos) return 
 
-    const xOffset: number = parseFloat(this.getMouseCoords(event).split(',')[0]) - parseFloat(initialMousePos!.split(',')[0]) 
-    const yOffset: number = parseFloat(this.getMouseCoords(event).split(',')[1]) - parseFloat(initialMousePos!.split(',')[1])
+    const xOffset: number = parseFloat(this.getMouseCoords(event).split(',')[0]) - parseFloat(initialMousePos!.split(',')[0]);
+    const yOffset: number = parseFloat(this.getMouseCoords(event).split(',')[1]) - parseFloat(initialMousePos!.split(',')[1]);
 
     // move center point
-   
     vertices.forEach(vertex => { 
       this.updateVertexCoords([vertex, null], vertex.getOffsetCoords(`${xOffset},${yOffset}`), event, false);
       this.updateVertexCoords([vertex, 'cw'], vertex.getCWOffsetCoords(`${xOffset},${yOffset}`), event, false);
       this.updateVertexCoords([vertex, 'ccw'], vertex.getCCWOffsetCoords(`${xOffset},${yOffset}`), event, false);
-      vertex.setCenterCoords(`${parseFloat(initialCenter!.split(',')[0]) + xOffset},${parseFloat(initialCenter!.split(',')[1]) + yOffset}`)
+      vertex.setCenterCoords(`${parseFloat(initialCenter!.split(',')[0]) + xOffset},${parseFloat(initialCenter!.split(',')[1]) + yOffset}`);
+    })
+  }
+
+  adjustShapeSize (event: React.WheelEvent<HTMLDivElement>) {
+    const { vertices } = this.state;
+    const zoomDirection: string = event.deltaY > 0 ? 'out' : 'in';
+    // if (!event.altKey) return;
+
+    let valid = true;
+
+    vertices.forEach(vertex => {
+      if (zoomDirection === 'in') {
+        if (vertex.withinCenter(vertex.getPointOnGradient(-1))) {
+          valid = false
+        } 
+      } else {
+        if (vertex.withinCenter(vertex.getPointOnGradient(1))) {
+          valid = false
+        } 
+      }
+    });
+
+    if (!valid) return
+
+    const temp = vertices.map(vertex => {
+      if (zoomDirection === 'out') vertex.setCoords(vertex.getPointOnGradient(1), event, false)
+      else vertex.setCoords(vertex.getPointOnGradient(-1), event, false) 
+      return vertex
     })
 
+    this.setState({
+      vertices: temp
+    })
   }
 
   render() {
@@ -179,14 +206,13 @@ export default class SVGDisplay extends Component<Props, State> {
     const { isSharp, isEdit } = this.props;
     return (
       <div className="svg_display"
-        // onMouseMove={e => initialMousePos ? this.setShapeOffset(e) : null} // if has currentDragging
         onMouseMove={e => currentDragging[0] ? this.updateVertexCoords(currentDragging!, this.getMouseCoords(e), e, true) : initialMousePos ? this.setShapeOffset(e) : null}
         onMouseUp={e => {this.setCurrentDragging(null); this.setInitialMousePos(null)}}
         onMouseLeave={e => {this.setCurrentDragging(null); this.setInitialMousePos(null)}}
         onMouseDown={e => this.setInitialMousePos(e)}
         style={{cursor: currentDragging[0] ? 'pointer' : ''}}
+        onWheel={(e) => {this.adjustShapeSize(e)}}
       >
-        
         <BezierLineOverlay vertices={vertices} isEdit={isEdit}/>
         <div className="svg_canvas">
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1" width={500} height={500} onMouseEnter={() => console.log('dd')}>
@@ -195,7 +221,7 @@ export default class SVGDisplay extends Component<Props, State> {
               d={isSharp ? this.generateStraightPath(vertices) : this.generatePath(vertices)}
               width="100%"
               height="100%"
-              strokeWidth="0" 
+              strokeWidth="0"
             > 
             </path>
           </svg>

@@ -67,7 +67,7 @@ export default class Vertex {
 
     const slop: number = (centerY-currentCoordY)/(centerX-currentCoordX);
 
-    const distanceFromCenter = Math.floor(Math.sqrt(Math.pow((centerY-currentCoordY),2) + Math.pow((centerX-currentCoordX),2)))
+    // const distanceFromCenter = Math.floor(Math.sqrt(Math.pow((centerY-currentCoordY),2) + Math.pow((centerX-currentCoordX),2)))
 
     const perpendicularSlop: number = -(1/slop);
     const c = 20 - vertexCount   // length of bezier line (half) // segements increase, this number should reduce
@@ -77,13 +77,13 @@ export default class Vertex {
 
     // below lines could be optimised
     if (currentCoordY === centerX) {
-      if (currentCoordX <= centerX && clockwise || currentCoordX > centerX && !clockwise) {
+      if ((currentCoordX <= centerX && clockwise) || (currentCoordX > centerX && !clockwise)) {
         return `${currentCoordX},${Math.round((currentCoordY - (c)) * 100) / 100}` 
       }
       return `${currentCoordX},${Math.round((currentCoordY + (c)) * 100) / 100}` 
     }
 
-    if (currentCoordY < centerY && clockwise || currentCoordY > centerY && !clockwise) {
+    if ((currentCoordY < centerY && clockwise) || (currentCoordY > centerY && !clockwise)) {
       return `${Math.round((currentCoordX + a) * 100) / 100},${Math.round((currentCoordY + (a*perpendicularSlop)) * 100) / 100}` 
     } 
     return `${Math.round((currentCoordX - a) * 100) / 100},${Math.round((currentCoordY - (a*perpendicularSlop)) * 100) / 100}` 
@@ -122,7 +122,7 @@ export default class Vertex {
     this.y = y;
   }
 
-  public setCoords (coords: string, event: React.MouseEvent<HTMLDivElement, MouseEvent>, autoSetBezier: boolean): void  {
+  public setCoords (coords: string, event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.WheelEvent<HTMLDivElement>, autoSetBezier: boolean): void  {
     this.setX(parseFloat(coords.split(',')[0]));
     this.setY(parseFloat(coords.split(',')[1]));
 
@@ -186,6 +186,31 @@ export default class Vertex {
 
   public setCenterCoords(coords: string): void {
     this.centerCoords = coords
+  }
+
+  public getPointOnGradient (increment: number): string {
+    const centerX: number = parseFloat(this.centerCoords.split(',')[0])
+    const centerY: number = parseFloat(this.centerCoords.split(',')[1])
+
+    const slop: number = (centerY-this.x)/(centerX-this.y);
+    
+    const c = increment  
+    const a = c/Math.sqrt(1+Math.pow(slop,2));
+    // console.log(this.centerCoords)
+    return `${Math.round((this.x + (a*slop)) * 100) / 100},${Math.round((this.y + (a)) * 100) / 100}`
+  }
+
+  public withinCenter (currentCoord: string): boolean{
+    const currentCoordX = parseFloat(currentCoord.split(',')[0]);
+    const currentCoordY = parseFloat(currentCoord.split(',')[1]);
+
+    if ((currentCoordX < 52 && currentCoordX > 48) && (currentCoordY < 52 && currentCoordY > 48)) {
+      console.log('mid')
+      return true;
+    }
+
+ 
+    return false; 
   }
 
 }
