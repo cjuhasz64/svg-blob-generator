@@ -6,8 +6,8 @@ import eightVertices from '../../images/8vertices.png'
 import ctrlKey from '../../images/svgs/ctrl-control-button-icon.svg'
 import altKey from '../../images/svgs/alt-button-icon.svg'
 
-import { Slider, Stack, FormControlLabel, Checkbox,Typography, styled, CheckboxProps, Button } from '@mui/material';
-import { PassThrough } from 'stream';
+import { Slider, Stack, FormControlLabel, Checkbox,Typography, styled, CheckboxProps} from '@mui/material';
+// import { PassThrough } from 'stream';
 
 interface Props {
   setBloomFactor: (args1: number) => void,
